@@ -15112,7 +15112,7 @@ u8 rtw_ps_annc(_adapter *adapter, bool ps)
 					set_channel_bwmode(iface, ch, offset, bw);
 				}
 				#endif /* CONFIG_MCC_MODE */
-				issue_nulldata(iface, NULL, ps, 3, 500);
+				issue_nulldata(iface, NULL, ps, 3, 50);
 				ps_anc = 1;
 			}
 		#ifdef CONFIG_RTW_MESH

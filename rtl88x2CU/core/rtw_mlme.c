@@ -2063,7 +2063,8 @@ u8 _rtw_sitesurvey_condition_check(const char *caller, _adapter *adapter, bool c
 	}
 
 	if (rtw_is_scan_deny(adapter)) {
-		RTW_INFO("%s ("ADPT_FMT") : scan deny\n", caller, ADPT_ARG(adapter));
+		RTW_INFO("%s ("ADPT_FMT") : scan deny and dpp need sleep 500ms\n", caller, ADPT_ARG(adapter));
+		rtw_msleep_os(500);
 		ss_condition = SS_DENY_BY_DRV;
 		goto _exit;
 	}

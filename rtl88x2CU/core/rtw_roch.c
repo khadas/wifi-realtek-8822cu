@@ -55,9 +55,7 @@ static int rtw_ro_ch_handler(_adapter *adapter, u8 *buf)
 	struct rtw_roch_parm *roch_parm = (struct rtw_roch_parm *)buf;
 	struct rtw_wdev_priv *pwdev_priv = adapter_wdev_data(adapter);
 	struct roch_info *prochinfo = &adapter->rochinfo;
-#ifdef CONFIG_CONCURRENT_MODE
 	struct mlme_ext_priv *pmlmeext = &adapter->mlmeextpriv;
-#endif
 	u8 ready_on_channel = _FALSE;
 	u8 remain_ch;
 	unsigned int duration;
@@ -94,7 +92,7 @@ static int rtw_ro_ch_handler(_adapter *adapter, u8 *buf)
 
 	#ifdef CONFIG_CONCURRENT_MODE
 	if (rtw_mi_check_status(adapter, MI_LINKED) && (0 != rtw_mi_get_union_chan(adapter))) {
-		if ((remain_ch != rtw_mi_get_union_chan(adapter)) && !check_fwstate(&adapter->mlmepriv, WIFI_ASOC_STATE)) {
+		if ((remain_ch != rtw_mi_get_union_chan(adapter))) {
 			if (remain_ch != pmlmeext->cur_channel
 				#ifdef RTW_ROCH_BACK_OP
 				|| ATOMIC_READ(&pwdev_priv->switch_ch_to) == 1
@@ -118,6 +116,11 @@ static int rtw_ro_ch_handler(_adapter *adapter, u8 *buf)
 	{
 		if (remain_ch != rtw_get_oper_ch(adapter))
 			ready_on_channel = _TRUE;
+		/* if connected and remain_ch is not same as AP's channel
+		 * Note : cur_channel is AP's channel, oper_channel is the channel driver is now on.
+		 */
+		if (check_fwstate(&adapter->mlmepriv, WIFI_ASOC_STATE) && remain_ch != pmlmeext->cur_channel)
+			rtw_leave_opch(adapter);
 	}
 
 	if (ready_on_channel == _TRUE) {
